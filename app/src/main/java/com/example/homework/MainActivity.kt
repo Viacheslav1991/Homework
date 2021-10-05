@@ -3,7 +3,8 @@ package com.example.homework
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.example.homework.adapters.MoviesClicks
-import com.example.homework.data.models.MovieCard
+import com.example.homework.modelFromAcademy.Movie
+import com.example.homework.movieList.MoviesListFragment
 
 class MainActivity : AppCompatActivity(), MoviesClicks, MoviesDetailsFragment.MoviesDetailsClicks {
     private var moviesListFragment: MoviesListFragment? = null
@@ -54,12 +55,12 @@ class MainActivity : AppCompatActivity(), MoviesClicks, MoviesDetailsFragment.Mo
 
     }
 
-    override fun movieClick(movieCard: MovieCard) {
-        moviesDetailsFragment = MoviesDetailsFragment()
+    override fun movieClick(movie: Movie) {
+        moviesDetailsFragment = MoviesDetailsFragment.newInstance(movie)
         moviesDetailsFragment?.apply { setClickListener(this@MainActivity) }
         supportFragmentManager.beginTransaction()
             .apply {
-                add(
+                replace(
                     R.id.fragment_container,
                     moviesDetailsFragment!!,
                     DETAILS_FRAGMENT_TAG
@@ -68,4 +69,5 @@ class MainActivity : AppCompatActivity(), MoviesClicks, MoviesDetailsFragment.Mo
                 commit()
             }
     }
+
 }

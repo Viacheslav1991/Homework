@@ -4,4 +4,6 @@
     <dimen name="space_3x">12dp</dimen>
     <dimen name="space_2x">8dp</dimen>
     <dimen name="space_1x">4dp</dimen>
+    <dimen name="text_1">10sp</dimen>
+    <dimen name="text_2">20sp</dimen>
 </resources>

@@ -1,17 +1,20 @@
-package com.example.homework
+package com.example.homework.movieList
 
-import android.content.Context
 import android.os.Bundle
-import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.homework.R
 import com.example.homework.adapters.MovieListAdapter
 import com.example.homework.adapters.MoviesClicks
-import com.example.homework.domain.MoviesDataSource
+import com.example.homework.dataFromAcademy.JsonMovieRepository
+import com.example.homework.dataFromAcademy.MovieRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 /**
  * A fragment representing a list of Items.
@@ -21,6 +24,7 @@ class MoviesListFragment : Fragment() {
     private var columnCount = 2
     private var listener: MoviesClicks? = null
     private lateinit var adapter: MovieListAdapter
+    private lateinit var coroutineScope: CoroutineScope
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,27 +38,25 @@ class MoviesListFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+
         val view = inflater.inflate(R.layout.fragment_movies_list, container, false)
         val recycler = view.findViewById<RecyclerView>(R.id.rv_movie_cards)
+        coroutineScope = CoroutineScope(context = Dispatchers.IO)
         adapter = MovieListAdapter(listener)
-        recycler.adapter = adapter
-        /*with(recycler) {
-            layoutManager = when {
-                columnCount <= 1 -> LinearLayoutManager(context)
-                else -> GridLayoutManager(context, columnCount)
-            }
-        }*/
         recycler.layoutManager = GridLayoutManager(context, 2)
-        adapter.bindCards(MoviesDataSource(activity as Context).getCards())
+        recycler.adapter = adapter
         return view
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-       /* avengersIV = view.findViewById<ImageView>(R.id.ivAvengers)
-            .apply {
-                setOnClickListener { listener?.avengersClick() }
-            }*/
+    override fun onStart() {
+        super.onStart()
+        updateData()
+    }
+    private fun updateData() {
+        coroutineScope.launch {
+            adapter.bindCards((JsonMovieRepository(requireContext()) as MovieRepository).loadMovies())
+            launch(Dispatchers.Main) { adapter.notifyDataSetChanged() }
+        }
     }
 
 
