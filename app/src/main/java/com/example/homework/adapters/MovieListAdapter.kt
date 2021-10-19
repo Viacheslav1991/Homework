@@ -2,9 +2,10 @@ package com.example.homework.adapters
 
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
@@ -15,11 +16,9 @@ import com.example.homework.modelFromAcademy.Movie
 private const val TAG = "MovieListAdapter"
 
 class MovieListAdapter(private val clickListener: MoviesClicks?) :
-    RecyclerView.Adapter<MovieViewHolder>() {
+    ListAdapter<Movie, MovieViewHolder>(MovieDiffCallback()) {
     private var movies: List<Movie> = listOf()
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MovieViewHolder {
-        val view: View = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_movie_card, parent, false)
 
         val itemBinding =
             ItemMovieCardBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -63,7 +62,6 @@ class MovieViewHolder(private val itemBinding: ItemMovieCardBinding) :
         itemBinding.tvGenre.text = movie.genres.joinToString { genre -> genre.name }
         itemBinding.tvCardCountReviews.text =
             context.getString(R.string.reviews, movie.reviewCount.toString())
-//        getString(R.string.age_limit, movie.pgAge.toString())
     }
 
     private fun <B> bindStars(movieRating: Int, binding: B) {
@@ -120,4 +118,11 @@ private val RecyclerView.ViewHolder.context
 
 interface MoviesClicks {
     fun movieClick(movie: Movie)
+}
+
+private class MovieDiffCallback : DiffUtil.ItemCallback<Movie>() {
+    override fun areItemsTheSame(oldItem: Movie, newItem: Movie): Boolean =
+        (oldItem.id == newItem.id)
+
+    override fun areContentsTheSame(oldItem: Movie, newItem: Movie): Boolean = (oldItem == newItem)
 }
